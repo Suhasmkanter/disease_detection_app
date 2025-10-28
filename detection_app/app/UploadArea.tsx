@@ -86,11 +86,14 @@ export default function UploadArea() {
         } as any);
       }
 
-      const response = await fetch("http://10.241.33.53:3000/predict", {
-        method: "POST",
-        headers: { Accept: "application/json" },
-        body: formData,
-      });
+      const response = await fetch(
+        "https://disease-detection-app.onrender.com/predict",
+        {
+          method: "POST",
+          headers: { Accept: "application/json" },
+          body: formData,
+        }
+      );
 
       const text = await response.text();
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
