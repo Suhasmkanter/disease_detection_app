@@ -8,6 +8,14 @@ import { spawn } from "child_process";
 
 const app = express();
 app.use(cors());
+const allowedOrigins = 'https://final-year-project-five-kappa.vercel.app'
+app.use(
+    cors({
+        origin: allowedOrigins,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    })
+);
 
 // Multer memory storage
 const storage = multer.memoryStorage();
