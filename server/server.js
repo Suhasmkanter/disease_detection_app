@@ -62,6 +62,7 @@ function downsample(channelData, factor) {
 // -------------------- Brain Tumor API --------------------
 app.post("/predict/braintumor", upload.array("images"), async (req, res) => {
     try {
+        console.log('hello bro ')
         const files = req.files;
         if (!files || files.length === 0) return res.status(400).json({ error: "No images uploaded" });
         console.log('hello bro', files)
@@ -72,17 +73,34 @@ app.post("/predict/braintumor", upload.array("images"), async (req, res) => {
 
         const client = await Client.connect("suhasmkanter/brain_tumor");
         const result = await client.predict("/predict", { model_choice: 'Brain Tumor', files: images });
+
         let predictions = [];
+
+        // Ensure predictions exist and are an array
         if (result?.data?.[0]?.predictions && Array.isArray(result.data[0].predictions)) {
             predictions = result.data[0].predictions.map(e => ({
                 filename: e.filename,
-                result: e.result,
-                disease: e.disease,
-                confidence: e.confidence,
-                probabilities: e.probabilities
+                result: e.result || null,       // null if prediction not available
+                disease: e.disease || null,     // null if prediction not available
+                confidence: e.confidence || null,
+                probabilities: e.probabilities || null,
+                error: e.error || null           // will have validator error if image rejected
             }));
+        } else {
+            // fallback if predictions array is missing entirely
+            predictions = [{
+                filename: "unknown",
+                result: null,
+                disease: null,
+                confidence: null,
+                probabilities: null,
+                error: "No predictions returned from server"
+            }];
         }
 
+        console.log(predictions);
+
+        console.log(result.data)
         res.json({ predictions });
     } catch (err) {
         console.error(err);
